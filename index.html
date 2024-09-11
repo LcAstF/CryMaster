@@ -9,82 +9,164 @@
     <script src="https://unpkg.com/dompurify@2.3.3/dist/purify.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
+        :root {
+            --primary-color: #0088cc;
+            --secondary-color: #4CAF50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        .container {
             max-width: 600px;
             margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
         }
         .button {
-            padding: 10px 15px;
-            margin: 5px;
+            padding: 12px 20px;
+            margin: 10px 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        .button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
         }
         .input {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .input:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
         .alert {
             padding: 15px;
-            margin: 10px 0;
+            margin: 15px 0;
             border-radius: 5px;
+            font-weight: bold;
         }
         .alert-info {
             background-color: #e3f2fd;
-            color: #0d47a1;
+            color: var(--primary-color);
+            border-left: 5px solid var(--primary-color);
         }
         .alert-error {
             background-color: #ffebee;
-            color: #b71c1c;
+            color: var(--error-color);
+            border-left: 5px solid var(--error-color);
         }
         #qrcode {
             text-align: center;
             margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         #reader {
             width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>Secure Payment QR Mini App</h1>
-    
-    <div id="userInfo" class="alert alert-info"></div>
+    <div class="container">
+        <h1>Secure Payment QR Mini App</h1>
+        
+        <div id="userInfo" class="alert alert-info"></div>
 
-    <div>
-        <button id="generateBtn" class="button">Generate QR</button>
-        <button id="scanBtn" class="button">Scan QR</button>
-    </div>
-
-    <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
-
-    <div id="generateSection">
-        <input type="text" id="amountInput" placeholder="Amount" class="input">
-        <input type="text" id="walletInput" placeholder="Wallet Address" class="input">
-        <div id="qrcode"></div>
-    </div>
-
-    <div id="scanSection" style="display: none;">
-        <div class="alert alert-info">
-            <h3>Scan QR Code</h3>
-            <p>Position the QR code within the camera frame to scan.</p>
+        <div class="tab-buttons">
+            <button id="generateBtn" class="button">Generate QR</button>
+            <button id="scanBtn" class="button">Scan Payment QR</button>
         </div>
-        <div id="reader"></div>
-        <div id="scanResult" class="alert alert-info" style="display: none;"></div>
+
+        <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+
+        <div id="generateSection" class="section">
+            <input type="text" id="amountInput" placeholder="Amount" class="input">
+            <input type="text" id="walletInput" placeholder="Wallet Address" class="input" readonly>
+            <button id="scanWalletBtn" class="button">Scan Wallet Address</button>
+            <div id="qrcode"></div>
+        </div>
+
+        <div id="scanSection" class="section">
+            <div class="alert alert-info">
+                <h3>Scan Payment QR Code</h3>
+                <p>Position the QR code within the camera frame to scan.</p>
+            </div>
+            <div id="reader"></div>
+            <div id="scanResult" class="alert alert-info" style="display: none;"></div>
+        </div>
+
+        <div id="scanWalletSection" class="section">
+            <div class="alert alert-info">
+                <h3>Scan Wallet Address QR Code</h3>
+                <p>Position the wallet address QR code within the camera frame to scan.</p>
+            </div>
+            <div id="walletReader"></div>
+        </div>
     </div>
 
     <script>
         const webApp = window.Telegram.WebApp;
         let rateLimitCount = 0;
         let rateLimitTimer = null;
+        let html5QrCode = null;
+        let html5QrCodeWallet = null;
 
-        // Simulated API function (replace with your actual API)
         const api = {
             processPayment: async (amount, address, currency = 'USD') => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -110,28 +192,35 @@
 
             applyTheme();
             setupEventListeners();
+            setMode('generate');
         }
 
         function applyTheme() {
             const theme = webApp.themeParams;
-            document.body.style.backgroundColor = theme.bg_color;
-            document.body.style.color = theme.text_color;
+            document.documentElement.style.setProperty('--bg-color', theme.bg_color);
+            document.documentElement.style.setProperty('--text-color', theme.text_color);
+            document.documentElement.style.setProperty('--primary-color', theme.button_color);
+            document.documentElement.style.setProperty('--secondary-color', theme.button_text_color);
         }
 
         function setupEventListeners() {
             document.getElementById('generateBtn').addEventListener('click', () => setMode('generate'));
             document.getElementById('scanBtn').addEventListener('click', () => setMode('scan'));
+            document.getElementById('scanWalletBtn').addEventListener('click', () => setMode('scanWallet'));
             webApp.MainButton.onClick(generateQR);
         }
 
         function setMode(mode) {
-            document.getElementById('generateSection').style.display = mode === 'generate' ? 'block' : 'none';
-            document.getElementById('scanSection').style.display = mode === 'scan' ? 'block' : 'none';
+            document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+            document.getElementById(`${mode}Section`).style.display = 'block';
             if (mode === 'generate') {
                 webApp.MainButton.setText('Generate QR').show();
-            } else {
+            } else if (mode === 'scan') {
                 webApp.MainButton.hide();
                 startQRScanner();
+            } else if (mode === 'scanWallet') {
+                webApp.MainButton.hide();
+                startWalletScanner();
             }
         }
 
@@ -148,7 +237,7 @@
                 return false;
             }
             if (!walletAddress || walletAddress.length < 26 || walletAddress.length > 35) {
-                showError('Please enter a valid wallet address');
+                showError('Please scan a valid wallet address');
                 return false;
             }
             return true;
@@ -158,10 +247,9 @@
             const errorAlert = document.getElementById('errorAlert');
             errorAlert.textContent = message;
             errorAlert.style.display = 'block';
-        }
-
-        function hideError() {
-            document.getElementById('errorAlert').style.display = 'none';
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 3000);
         }
 
         function checkRateLimit() {
@@ -178,7 +266,6 @@
         }
 
         async function generateQR() {
-            hideError();
             try {
                 checkRateLimit();
             } catch (err) {
@@ -193,25 +280,37 @@
 
             webApp.showConfirm(`Are you sure you want to process a payment of ${amount} to ${walletAddress}?`, async (confirmed) => {
                 if (confirmed) {
+                    webApp.MainButton.showProgress();
                     try {
                         const result = await api.processPayment(amount, walletAddress);
                         const data = JSON.stringify({ amount, walletAddress, txId: Date.now() });
                         
                         const qrcodeElement = document.getElementById('qrcode');
                         qrcodeElement.innerHTML = '';
-                        new QRCode(qrcodeElement, data);
+                        new QRCode(qrcodeElement, {
+                            text: data,
+                            width: 200,
+                            height: 200,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
                         
                         webApp.showAlert(result.message);
                     } catch (err) {
                         showError(err.message);
-                        webApp.showAlert(err.message);
+                    } finally {
+                        webApp.MainButton.hideProgress();
                     }
                 }
             });
         }
 
         function startQRScanner() {
-            const html5QrCode = new Html5Qrcode("reader");
+            if (html5QrCode) {
+                html5QrCode.stop();
+            }
+            html5QrCode = new Html5Qrcode("reader");
             const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                 html5QrCode.stop();
                 handleScan(decodedText);
@@ -221,19 +320,41 @@
             html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
         }
 
+        function startWalletScanner() {
+            if (html5QrCodeWallet) {
+                html5QrCodeWallet.stop();
+            }
+            html5QrCodeWallet = new Html5Qrcode("walletReader");
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                html5QrCodeWallet.stop();
+                handleWalletScan(decodedText);
+            };
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCodeWallet.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+        }
+
         function handleScan(result) {
             try {
                 const scannedData = JSON.parse(sanitizeInput(result));
                 const scanResultElement = document.getElementById('scanResult');
                 scanResultElement.innerHTML = `
                     <h3>Scan Result</h3>
-                    <p>Amount: ${scannedData.amount}, Wallet: ${scannedData.walletAddress}</p>
+                    <p>Amount: ${scannedData.amount}</p>
+                    <p>Wallet: ${scannedData.walletAddress}</p>
+                    <p>Transaction ID: ${scannedData.txId}</p>
                 `;
                 scanResultElement.style.display = 'block';
-                hideError();
             } catch (error) {
                 showError('Invalid QR Code');
             }
+        }
+
+        function handleWalletScan(result) {
+            const walletInput = document.getElementById('walletInput');
+            walletInput.value = sanitizeInput(result);
+            setMode('generate');
+            showError('Wallet address scanned successfully!');
         }
 
         initApp();
