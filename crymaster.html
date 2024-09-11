@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryMaster Payment QR Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <script src="https://unpkg.com/dompurify@2.3.3/dist/purify.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+        .alert-error {
+            background-color: #ffebee;
+            color: #b71c1c;
+        }
+        #qrcode {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #reader {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Secure Payment QR Mini App</h1>
+    
+    <div id="userInfo" class="alert alert-info"></div>
+
+    <div>
+        <button id="generateBtn" class="button">Generate QR</button>
+        <button id="scanBtn" class="button">Scan QR</button>
+    </div>
+
+    <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+
+    <div id="generateSection">
+        <input type="text" id="amountInput" placeholder="Amount" class="input">
+        <input type="text" id="walletInput" placeholder="Wallet Address" class="input">
+        <div id="qrcode"></div>
+    </div>
+
+    <div id="scanSection" style="display: none;">
+        <div class="alert alert-info">
+            <h3>Scan QR Code</h3>
+            <p>Position the QR code within the camera frame to scan.</p>
+        </div>
+        <div id="reader"></div>
+        <div id="scanResult" class="alert alert-info" style="display: none;"></div>
+    </div>
+
+    <script>
+        const webApp = window.Telegram.WebApp;
+        let rateLimitCount = 0;
+        let rateLimitTimer = null;
+
+        // Simulated API function (replace with your actual API)
+        const api = {
+            processPayment: async (amount, address, currency = 'USD') => {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (Math.random() > 0.2) {
+                    return { success: true, message: 'Payment processed successfully' };
+                } else {
+                    throw new Error('Payment failed. Please try again.');
+                }
+            },
+        };
+
+        function initApp() {
+            webApp.ready();
+            webApp.MainButton.setText('Generate QR').show();
+
+            const user = webApp.initDataUnsafe.user;
+            if (user) {
+                document.getElementById('userInfo').innerHTML = `
+                    <h3>Welcome, ${user.first_name}!</h3>
+                    <p>User ID: ${user.id}</p>
+                `;
+            }
+
+            applyTheme();
+            setupEventListeners();
+        }
+
+        function applyTheme() {
+            const theme = webApp.themeParams;
+            document.body.style.backgroundColor = theme.bg_color;
+            document.body.style.color = theme.text_color;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('generateBtn').addEventListener('click', () => setMode('generate'));
+            document.getElementById('scanBtn').addEventListener('click', () => setMode('scan'));
+            webApp.MainButton.onClick(generateQR);
+        }
+
+        function setMode(mode) {
+            document.getElementById('generateSection').style.display = mode === 'generate' ? 'block' : 'none';
+            document.getElementById('scanSection').style.display = mode === 'scan' ? 'block' : 'none';
+            if (mode === 'generate') {
+                webApp.MainButton.setText('Generate QR').show();
+            } else {
+                webApp.MainButton.hide();
+                startQRScanner();
+            }
+        }
+
+        function sanitizeInput(input) {
+            return DOMPurify.sanitize(input);
+        }
+
+        function validateInputs() {
+            const amount = sanitizeInput(document.getElementById('amountInput').value);
+            const walletAddress = sanitizeInput(document.getElementById('walletInput').value);
+
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                showError('Please enter a valid amount');
+                return false;
+            }
+            if (!walletAddress || walletAddress.length < 26 || walletAddress.length > 35) {
+                showError('Please enter a valid wallet address');
+                return false;
+            }
+            return true;
+        }
+
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        function checkRateLimit() {
+            if (rateLimitCount >= 5) {
+                throw new Error('Rate limit exceeded. Please try again later.');
+            }
+            rateLimitCount++;
+            if (!rateLimitTimer) {
+                rateLimitTimer = setTimeout(() => {
+                    rateLimitCount = 0;
+                    rateLimitTimer = null;
+                }, 60000);
+            }
+        }
+
+        async function generateQR() {
+            hideError();
+            try {
+                checkRateLimit();
+            } catch (err) {
+                showError(err.message);
+                return;
+            }
+
+            if (!validateInputs()) return;
+
+            const amount = document.getElementById('amountInput').value;
+            const walletAddress = document.getElementById('walletInput').value;
+
+            webApp.showConfirm(`Are you sure you want to process a payment of ${amount} to ${walletAddress}?`, async (confirmed) => {
+                if (confirmed) {
+                    try {
+                        const result = await api.processPayment(amount, walletAddress);
+                        const data = JSON.stringify({ amount, walletAddress, txId: Date.now() });
+                        
+                        const qrcodeElement = document.getElementById('qrcode');
+                        qrcodeElement.innerHTML = '';
+                        new QRCode(qrcodeElement, data);
+                        
+                        webApp.showAlert(result.message);
+                    } catch (err) {
+                        showError(err.message);
+                        webApp.showAlert(err.message);
+                    }
+                }
+            });
+        }
+
+        function startQRScanner() {
+            const html5QrCode = new Html5Qrcode("reader");
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                html5QrCode.stop();
+                handleScan(decodedText);
+            };
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+        }
+
+        function handleScan(result) {
+            try {
+                const scannedData = JSON.parse(sanitizeInput(result));
+                const scanResultElement = document.getElementById('scanResult');
+                scanResultElement.innerHTML = `
+                    <h3>Scan Result</h3>
+                    <p>Amount: ${scannedData.amount}, Wallet: ${scannedData.walletAddress}</p>
+                `;
+                scanResultElement.style.display = 'block';
+                hideError();
+            } catch (error) {
+                showError('Invalid QR Code');
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
