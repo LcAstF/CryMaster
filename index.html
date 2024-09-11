@@ -404,4 +404,103 @@
                 const scannedData = JSON.parse(sanitizeInput(result));
                 const scanResultElement = document.getElementById('scanResult');
                 scanResultElement.innerHTML = `
-                    <h3>Scan Result</h
+                    <h3>Scan Result</h3>
+                    <p>Amount: ${scannedData.amount}</p>
+                    <p>Wallet: ${scannedData.walletAddress}</p>
+                    <p>Transaction Hash: ${scannedData.txHash}</p>
+                `;
+                scanResultElement.style.display = 'block';
+            } catch (error) {
+                showError('Invalid QR Code');
+            }
+        }
+
+        function handleWalletScan(result) {
+            const walletInput = document.getElementById('walletInput');
+            walletInput.value = sanitizeInput(result);
+            setMode('generate');
+            showError('Wallet address scanned successfully!');
+        }
+
+        // Function to check if the connected network is correct
+        async function checkNetwork() {
+            if (!web3) {
+                throw new Error('Web3 is not initialized');
+            }
+
+            const networkId = await web3.eth.net.getId();
+            const desiredNetworkId = 1; // Replace with your desired network ID (1 for Ethereum mainnet)
+
+            if (networkId !== desiredNetworkId) {
+                throw new Error('Please connect to the correct network');
+            }
+        }
+
+        // Function to get token balance
+        async function getTokenBalance(address) {
+            if (!web3) {
+                throw new Error('Web3 is not initialized');
+            }
+
+            const tokenContract = new web3.eth.Contract(tokenABI, tokenContractAddress);
+            const balance = await tokenContract.methods.balanceOf(address).call();
+            return web3.utils.fromWei(balance, 'ether');
+        }
+
+        // Function to update UI with user's token balance
+        async function updateBalanceUI() {
+            try {
+                const balance = await getTokenBalance(currentAccount);
+                const userInfoElement = document.getElementById('userInfo');
+                userInfoElement.innerHTML += `<p>Token Balance: ${balance}</p>`;
+            } catch (error) {
+                console.error('Error updating balance:', error);
+            }
+        }
+
+        // Enhanced initApp function
+        async function initApp() {
+            webApp.ready();
+            webApp.MainButton.setText('Generate QR').show();
+
+            const user = webApp.initDataUnsafe.user;
+            if (user) {
+                document.getElementById('userInfo').innerHTML = `
+                    <h3>Welcome, ${user.first_name}!</h3>
+                    <p>User ID: ${user.id}</p>
+                `;
+            }
+
+            applyTheme();
+            setupEventListeners();
+            setMode('generate');
+            
+            try {
+                await initWeb3();
+                await checkNetwork();
+                await updateBalanceUI();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Function to handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                showError('Please connect to MetaMask.');
+            } else if (accounts[0] !== currentAccount) {
+                currentAccount = accounts[0];
+                updateBalanceUI();
+            }
+        }
+
+        // Add event listener for account changes
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+        }
+
+        // Initialize the app
+        initApp();
+    </script>
+</body>
+</html>
