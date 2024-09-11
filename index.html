@@ -91,7 +91,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        #reader {
+        #reader, #walletReader {
             width: 100%;
             max-width: 300px;
             margin: 0 auto;
@@ -192,6 +192,23 @@
                     }
                 ],
                 "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    {
+                        "name": "_owner",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "name": "balance",
+                        "type": "uint256"
+                    }
+                ],
+                "type": "function"
             }
         ];
 
@@ -257,7 +274,15 @@
             applyTheme();
             setupEventListeners();
             setMode('generate');
-            initWeb3();
+            initWeb3().then(() => {
+                checkNetwork().then(() => {
+                    updateBalanceUI();
+                }).catch((error) => {
+                    showError(error.message);
+                });
+            }).catch((error) => {
+                showError('Failed to initialize Web3: ' + error.message);
+            });
         }
 
         function applyTheme() {
@@ -301,17 +326,26 @@
                 showError('Please enter a valid amount');
                 return false;
             }
-            if (!walletAddress || walletAddress.length < 26 || walletAddress.length > 42) {
+            if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
                 showError('Please scan a valid wallet address');
                 return false;
             }
             return true;
         }
 
-        function showError(message) {
+        function showError(message, type = 'error') {
             const errorAlert = document.getElementById('errorAlert');
             errorAlert.textContent = message;
             errorAlert.style.display = 'block';
+            
+            if (type === 'success') {
+                errorAlert.classList.remove('alert-error');
+                errorAlert.classList.add('alert-info');
+            } else {
+                errorAlert.classList.remove('alert-info');
+                errorAlert.classList.add('alert-error');
+            }
+
             setTimeout(() => {
                 errorAlert.style.display = 'none';
             }, 3000);
@@ -382,7 +416,11 @@
             };
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+                .catch((err) => {
+                    console.error("Error starting QR scanner:", err);
+                    showError("Failed to start QR scanner. Please try again.");
+                });
         }
 
         function startWalletScanner() {
@@ -396,7 +434,11 @@
             };
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-            html5QrCodeWallet.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+            html5QrCodeWallet.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+                .catch((err) => {
+                    console.error("Error starting wallet scanner:", err);
+                    showError("Failed to start wallet scanner. Please try again.");
+                });
         }
 
         function handleScan(result) {
@@ -417,12 +459,17 @@
 
         function handleWalletScan(result) {
             const walletInput = document.getElementById('walletInput');
-            walletInput.value = sanitizeInput(result);
-            setMode('generate');
-            showError('Wallet address scanned successfully!');
+            
+            // Check if the scanned result is a valid Ethereum address
+            if (/^0x[a-fA-F0-9]{40}$/.test(result)) {
+                walletInput.value = sanitizeInput(result);
+                setMode('generate');
+                showError('Wallet address scanned successfully!', 'success');
+            } else {
+                showError('Invalid wallet address QR code. Please try again.');
+            }
         }
 
-        // Function to check if the connected network is correct
         async function checkNetwork() {
             if (!web3) {
                 throw new Error('Web3 is not initialized');
@@ -436,7 +483,6 @@
             }
         }
 
-        // Function to get token balance
         async function getTokenBalance(address) {
             if (!web3) {
                 throw new Error('Web3 is not initialized');
@@ -447,7 +493,6 @@
             return web3.utils.fromWei(balance, 'ether');
         }
 
-        // Function to update UI with user's token balance
         async function updateBalanceUI() {
             try {
                 const balance = await getTokenBalance(currentAccount);
@@ -455,36 +500,10 @@
                 userInfoElement.innerHTML += `<p>Token Balance: ${balance}</p>`;
             } catch (error) {
                 console.error('Error updating balance:', error);
+                showError('Failed to update token balance');
             }
         }
 
-        // Enhanced initApp function
-        async function initApp() {
-            webApp.ready();
-            webApp.MainButton.setText('Generate QR').show();
-
-            const user = webApp.initDataUnsafe.user;
-            if (user) {
-                document.getElementById('userInfo').innerHTML = `
-                    <h3>Welcome, ${user.first_name}!</h3>
-                    <p>User ID: ${user.id}</p>
-                `;
-            }
-
-            applyTheme();
-            setupEventListeners();
-            setMode('generate');
-            
-            try {
-                await initWeb3();
-                await checkNetwork();
-                await updateBalanceUI();
-            } catch (error) {
-                showError(error.message);
-            }
-        }
-
-        // Function to handle account changes
         function handleAccountsChanged(accounts) {
             if (accounts.length === 0) {
                 showError('Please connect to MetaMask.');
