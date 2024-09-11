@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
     <script src="https://unpkg.com/dompurify@2.3.3/dist/purify.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <style>
         :root {
             --primary-color: #0088cc;
@@ -166,14 +167,77 @@
         let rateLimitTimer = null;
         let html5QrCode = null;
         let html5QrCodeWallet = null;
+        let web3;
+        let currentAccount;
+        const tokenContractAddress = '0x1234567890123456789012345678901234567890'; // Replace with actual token contract address
+
+        const tokenABI = [
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_to",
+                        "type": "address"
+                    },
+                    {
+                        "name": "_value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transfer",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "type": "function"
+            }
+        ];
+
+        async function initWeb3() {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    const accounts = await web3.eth.getAccounts();
+                    currentAccount = accounts[0];
+                    console.log('Connected account:', currentAccount);
+                } catch (error) {
+                    console.error('User denied account access');
+                }
+            } else if (typeof window.web3 !== 'undefined') {
+                web3 = new Web3(window.web3.currentProvider);
+            } else {
+                console.log('No Web3 detected. Please use MetaMask or another Web3 provider.');
+            }
+        }
+
+        async function transferTokens(to, amount) {
+            if (!web3) {
+                throw new Error('Web3 is not initialized');
+            }
+
+            const tokenContract = new web3.eth.Contract(tokenABI, tokenContractAddress);
+            const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
+
+            try {
+                const result = await tokenContract.methods.transfer(to, amountInWei).send({ from: currentAccount });
+                console.log('Transfer result:', result);
+                return result;
+            } catch (error) {
+                console.error('Transfer error:', error);
+                throw error;
+            }
+        }
 
         const api = {
             processPayment: async (amount, address, currency = 'USD') => {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                if (Math.random() > 0.2) {
-                    return { success: true, message: 'Payment processed successfully' };
-                } else {
-                    throw new Error('Payment failed. Please try again.');
+                try {
+                    const result = await transferTokens(address, amount);
+                    return { success: true, message: 'Payment processed successfully', txHash: result.transactionHash };
+                } catch (error) {
+                    throw new Error('Payment failed: ' + error.message);
                 }
             },
         };
@@ -193,6 +257,7 @@
             applyTheme();
             setupEventListeners();
             setMode('generate');
+            initWeb3();
         }
 
         function applyTheme() {
@@ -236,7 +301,7 @@
                 showError('Please enter a valid amount');
                 return false;
             }
-            if (!walletAddress || walletAddress.length < 26 || walletAddress.length > 35) {
+            if (!walletAddress || walletAddress.length < 26 || walletAddress.length > 42) {
                 showError('Please scan a valid wallet address');
                 return false;
             }
@@ -278,12 +343,12 @@
             const amount = document.getElementById('amountInput').value;
             const walletAddress = document.getElementById('walletInput').value;
 
-            webApp.showConfirm(`Are you sure you want to process a payment of ${amount} to ${walletAddress}?`, async (confirmed) => {
+            webApp.showConfirm(`Are you sure you want to process a payment of ${amount} tokens to ${walletAddress}?`, async (confirmed) => {
                 if (confirmed) {
                     webApp.MainButton.showProgress();
                     try {
                         const result = await api.processPayment(amount, walletAddress);
-                        const data = JSON.stringify({ amount, walletAddress, txId: Date.now() });
+                        const data = JSON.stringify({ amount, walletAddress, txHash: result.txHash });
                         
                         const qrcodeElement = document.getElementById('qrcode');
                         qrcodeElement.innerHTML = '';
@@ -339,25 +404,4 @@
                 const scannedData = JSON.parse(sanitizeInput(result));
                 const scanResultElement = document.getElementById('scanResult');
                 scanResultElement.innerHTML = `
-                    <h3>Scan Result</h3>
-                    <p>Amount: ${scannedData.amount}</p>
-                    <p>Wallet: ${scannedData.walletAddress}</p>
-                    <p>Transaction ID: ${scannedData.txId}</p>
-                `;
-                scanResultElement.style.display = 'block';
-            } catch (error) {
-                showError('Invalid QR Code');
-            }
-        }
-
-        function handleWalletScan(result) {
-            const walletInput = document.getElementById('walletInput');
-            walletInput.value = sanitizeInput(result);
-            setMode('generate');
-            showError('Wallet address scanned successfully!');
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
+                    <h3>Scan Result</h
