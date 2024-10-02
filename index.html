@@ -3,523 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryMaster Payment QR Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
-    <script src="https://unpkg.com/dompurify@2.3.3/dist/purify.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #0088cc;
-            --secondary-color: #4CAF50;
-            --error-color: #f44336;
-            --text-color: #333;
-            --bg-color: #f5f5f5;
-        }
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: all 0.3s ease;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .button {
-            padding: 12px 20px;
-            margin: 10px 5px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            background-color: var(--primary-color);
-            color: #fff;
-        }
-        .button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        .input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        .input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        .alert {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .alert-info {
-            background-color: #e3f2fd;
-            color: var(--primary-color);
-            border-left: 5px solid var(--primary-color);
-        }
-        .alert-error {
-            background-color: #ffebee;
-            color: var(--error-color);
-            border-left: 5px solid var(--error-color);
-        }
-        #qrcode {
-            text-align: center;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        #reader, #walletReader {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-        .tab-buttons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .section {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <title>Privacy Policy</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>Secure Payment QR Mini App</h1>
-        
-        <div id="userInfo" class="alert alert-info"></div>
-
-        <div class="tab-buttons">
-            <button id="generateBtn" class="button">Generate QR</button>
-            <button id="scanBtn" class="button">Scan Payment QR</button>
-        </div>
-
-        <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
-
-        <div id="generateSection" class="section">
-            <input type="text" id="amountInput" placeholder="Amount" class="input">
-            <input type="text" id="walletInput" placeholder="Wallet Address" class="input" readonly>
-            <button id="scanWalletBtn" class="button">Scan Wallet Address</button>
-            <div id="qrcode"></div>
-        </div>
-
-        <div id="scanSection" class="section">
-            <div class="alert alert-info">
-                <h3>Scan Payment QR Code</h3>
-                <p>Position the QR code within the camera frame to scan.</p>
+<body class="bg-gray-100 text-gray-800">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow">
+            <div class="container mx-auto px-6 py-6">
+                <h1 class="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+                <p class="text-sm text-gray-600">Last updated: October 2, 2024</p>
             </div>
-            <div id="reader"></div>
-            <div id="scanResult" class="alert alert-info" style="display: none;"></div>
-        </div>
+        </header>
 
-        <div id="scanWalletSection" class="section">
-            <div class="alert alert-info">
-                <h3>Scan Wallet Address QR Code</h3>
-                <p>Position the wallet address QR code within the camera frame to scan.</p>
+        <main class="flex-grow container mx-auto px-6 py-8">
+            <!-- Information We Collect -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Information We Collect</h2>
+                <p class="mb-4">We collect several types of information to provide and improve our services:</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>
+                        <strong>Personal Information:</strong> When you interact with our website, we may collect personal data such as your name, email address, and phone number when voluntarily provided.
+                    </li>
+                    <li>
+                        <strong>Usage Data:</strong> We collect data on how the website is accessed and used. This may include your IP address, browser type, pages visited, and the time and date of your visit.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- How We Use Your Information -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">How We Use Your Information</h2>
+                <p class="mb-4">We use the collected information for various purposes:</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>To provide and maintain our website.</li>
+                    <li>To improve and personalize your user experience.</li>
+                    <li>To communicate with you about updates or services.</li>
+                    <li>To monitor and analyze website traffic.</li>
+                </ul>
+            </section>
+
+            <!-- Cookies -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Cookies</h2>
+                <p class="mb-4">Our website uses cookies to track user activity and improve user experience. You can control cookie preferences through your browser settings.</p>
+            </section>
+
+            <!-- Sharing Your Information -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sharing Your Information</h2>
+                <p class="mb-4">We do not sell or share your personal information with third parties except when required to:</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Comply with legal obligations.</li>
+                    <li>Protect our website and users from potential threats or fraud.</li>
+                </ul>
+            </section>
+
+            <!-- Data Security -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Data Security</h2>
+                <p class="mb-4">We use industry-standard security measures to protect your information. However, no method of transmission over the Internet is 100% secure.</p>
+            </section>
+
+            <!-- Your Data Rights -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Data Rights</h2>
+                <p class="mb-4">You have the right to:</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Access, correct, or delete your personal information.</li>
+                    <li>Withdraw consent to the use of your data.</li>
+                    <li>Lodge a complaint with a data protection authority if your rights are violated.</li>
+                </ul>
+            </section>
+
+            <!-- Changes to This Privacy Policy -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Changes to This Privacy Policy</h2>
+                <p class="mb-4">We may update this policy from time to time. We encourage you to review this page periodically for any changes.</p>
+            </section>
+        </main>
+
+        <footer class="bg-white shadow">
+            <div class="container mx-auto px-6 py-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Contact Us</h2>
+                <p>
+                    If you have any questions about this privacy policy, you can contact us at:<br>
+                    <a href="mailto:your-email@example.com" class="text-blue-500 hover:underline">your-email@example.com</a>
+                </p>
             </div>
-            <div id="walletReader"></div>
-        </div>
+        </footer>
     </div>
-
-    <script>
-        const webApp = window.Telegram.WebApp;
-        let rateLimitCount = 0;
-        let rateLimitTimer = null;
-        let html5QrCode = null;
-        let html5QrCodeWallet = null;
-        let web3;
-        let currentAccount;
-        const tokenContractAddress = '0x1234567890123456789012345678901234567890'; // Replace with actual token contract address
-
-        const tokenABI = [
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_to",
-                        "type": "address"
-                    },
-                    {
-                        "name": "_value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transfer",
-                "outputs": [
-                    {
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [
-                    {
-                        "name": "_owner",
-                        "type": "address"
-                    }
-                ],
-                "name": "balanceOf",
-                "outputs": [
-                    {
-                        "name": "balance",
-                        "type": "uint256"
-                    }
-                ],
-                "type": "function"
-            }
-        ];
-
-        async function initWeb3() {
-            if (typeof window.ethereum !== 'undefined') {
-                web3 = new Web3(window.ethereum);
-                try {
-                    await window.ethereum.enable();
-                    const accounts = await web3.eth.getAccounts();
-                    currentAccount = accounts[0];
-                    console.log('Connected account:', currentAccount);
-                } catch (error) {
-                    console.error('User denied account access');
-                }
-            } else if (typeof window.web3 !== 'undefined') {
-                web3 = new Web3(window.web3.currentProvider);
-            } else {
-                console.log('No Web3 detected. Please use MetaMask or another Web3 provider.');
-            }
-        }
-
-        async function transferTokens(to, amount) {
-            if (!web3) {
-                throw new Error('Web3 is not initialized');
-            }
-
-            const tokenContract = new web3.eth.Contract(tokenABI, tokenContractAddress);
-            const amountInWei = web3.utils.toWei(amount.toString(), 'ether');
-
-            try {
-                const result = await tokenContract.methods.transfer(to, amountInWei).send({ from: currentAccount });
-                console.log('Transfer result:', result);
-                return result;
-            } catch (error) {
-                console.error('Transfer error:', error);
-                throw error;
-            }
-        }
-
-        const api = {
-            processPayment: async (amount, address, currency = 'USD') => {
-                try {
-                    const result = await transferTokens(address, amount);
-                    return { success: true, message: 'Payment processed successfully', txHash: result.transactionHash };
-                } catch (error) {
-                    throw new Error('Payment failed: ' + error.message);
-                }
-            },
-        };
-
-        function initApp() {
-            webApp.ready();
-            webApp.MainButton.setText('Generate QR').show();
-
-            const user = webApp.initDataUnsafe.user;
-            if (user) {
-                document.getElementById('userInfo').innerHTML = `
-                    <h3>Welcome, ${user.first_name}!</h3>
-                    <p>User ID: ${user.id}</p>
-                `;
-            }
-
-            applyTheme();
-            setupEventListeners();
-            setMode('generate');
-            initWeb3().then(() => {
-                checkNetwork().then(() => {
-                    updateBalanceUI();
-                }).catch((error) => {
-                    showError(error.message);
-                });
-            }).catch((error) => {
-                showError('Failed to initialize Web3: ' + error.message);
-            });
-        }
-
-        function applyTheme() {
-            const theme = webApp.themeParams;
-            document.documentElement.style.setProperty('--bg-color', theme.bg_color);
-            document.documentElement.style.setProperty('--text-color', theme.text_color);
-            document.documentElement.style.setProperty('--primary-color', theme.button_color);
-            document.documentElement.style.setProperty('--secondary-color', theme.button_text_color);
-        }
-
-        function setupEventListeners() {
-            document.getElementById('generateBtn').addEventListener('click', () => setMode('generate'));
-            document.getElementById('scanBtn').addEventListener('click', () => setMode('scan'));
-            document.getElementById('scanWalletBtn').addEventListener('click', () => setMode('scanWallet'));
-            webApp.MainButton.onClick(generateQR);
-        }
-
-        function setMode(mode) {
-            document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
-            document.getElementById(`${mode}Section`).style.display = 'block';
-            if (mode === 'generate') {
-                webApp.MainButton.setText('Generate QR').show();
-            } else if (mode === 'scan') {
-                webApp.MainButton.hide();
-                startQRScanner();
-            } else if (mode === 'scanWallet') {
-                webApp.MainButton.hide();
-                startWalletScanner();
-            }
-        }
-
-        function sanitizeInput(input) {
-            return DOMPurify.sanitize(input);
-        }
-
-        function validateInputs() {
-            const amount = sanitizeInput(document.getElementById('amountInput').value);
-            const walletAddress = sanitizeInput(document.getElementById('walletInput').value);
-
-            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-                showError('Please enter a valid amount');
-                return false;
-            }
-            if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-                showError('Please scan a valid wallet address');
-                return false;
-            }
-            return true;
-        }
-
-        function showError(message, type = 'error') {
-            const errorAlert = document.getElementById('errorAlert');
-            errorAlert.textContent = message;
-            errorAlert.style.display = 'block';
-            
-            if (type === 'success') {
-                errorAlert.classList.remove('alert-error');
-                errorAlert.classList.add('alert-info');
-            } else {
-                errorAlert.classList.remove('alert-info');
-                errorAlert.classList.add('alert-error');
-            }
-
-            setTimeout(() => {
-                errorAlert.style.display = 'none';
-            }, 3000);
-        }
-
-        function checkRateLimit() {
-            if (rateLimitCount >= 5) {
-                throw new Error('Rate limit exceeded. Please try again later.');
-            }
-            rateLimitCount++;
-            if (!rateLimitTimer) {
-                rateLimitTimer = setTimeout(() => {
-                    rateLimitCount = 0;
-                    rateLimitTimer = null;
-                }, 60000);
-            }
-        }
-
-        async function generateQR() {
-            try {
-                checkRateLimit();
-            } catch (err) {
-                showError(err.message);
-                return;
-            }
-
-            if (!validateInputs()) return;
-
-            const amount = document.getElementById('amountInput').value;
-            const walletAddress = document.getElementById('walletInput').value;
-
-            webApp.showConfirm(`Are you sure you want to process a payment of ${amount} tokens to ${walletAddress}?`, async (confirmed) => {
-                if (confirmed) {
-                    webApp.MainButton.showProgress();
-                    try {
-                        const result = await api.processPayment(amount, walletAddress);
-                        const data = JSON.stringify({ amount, walletAddress, txHash: result.txHash });
-                        
-                        const qrcodeElement = document.getElementById('qrcode');
-                        qrcodeElement.innerHTML = '';
-                        new QRCode(qrcodeElement, {
-                            text: data,
-                            width: 200,
-                            height: 200,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.H
-                        });
-                        
-                        webApp.showAlert(result.message);
-                    } catch (err) {
-                        showError(err.message);
-                    } finally {
-                        webApp.MainButton.hideProgress();
-                    }
-                }
-            });
-        }
-
-        function startQRScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop();
-            }
-            html5QrCode = new Html5Qrcode("reader");
-            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                html5QrCode.stop();
-                handleScan(decodedText);
-            };
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-                .catch((err) => {
-                    console.error("Error starting QR scanner:", err);
-                    showError("Failed to start QR scanner. Please try again.");
-                });
-        }
-
-        function startWalletScanner() {
-            if (html5QrCodeWallet) {
-                html5QrCodeWallet.stop();
-            }
-            html5QrCodeWallet = new Html5Qrcode("walletReader");
-            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                html5QrCodeWallet.stop();
-                handleWalletScan(decodedText);
-            };
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-            html5QrCodeWallet.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-                .catch((err) => {
-                    console.error("Error starting wallet scanner:", err);
-                    showError("Failed to start wallet scanner. Please try again.");
-                });
-        }
-
-        function handleScan(result) {
-            try {
-                const scannedData = JSON.parse(sanitizeInput(result));
-                const scanResultElement = document.getElementById('scanResult');
-                scanResultElement.innerHTML = `
-                    <h3>Scan Result</h3>
-                    <p>Amount: ${scannedData.amount}</p>
-                    <p>Wallet: ${scannedData.walletAddress}</p>
-                    <p>Transaction Hash: ${scannedData.txHash}</p>
-                `;
-                scanResultElement.style.display = 'block';
-            } catch (error) {
-                showError('Invalid QR Code');
-            }
-        }
-
-        function handleWalletScan(result) {
-            const walletInput = document.getElementById('walletInput');
-            
-            // Check if the scanned result is a valid Ethereum address
-            if (/^0x[a-fA-F0-9]{40}$/.test(result)) {
-                walletInput.value = sanitizeInput(result);
-                setMode('generate');
-                showError('Wallet address scanned successfully!', 'success');
-            } else {
-                showError('Invalid wallet address QR code. Please try again.');
-            }
-        }
-
-        async function checkNetwork() {
-            if (!web3) {
-                throw new Error('Web3 is not initialized');
-            }
-
-            const networkId = await web3.eth.net.getId();
-            const desiredNetworkId = 1; // Replace with your desired network ID (1 for Ethereum mainnet)
-
-            if (networkId !== desiredNetworkId) {
-                throw new Error('Please connect to the correct network');
-            }
-        }
-
-        async function getTokenBalance(address) {
-            if (!web3) {
-                throw new Error('Web3 is not initialized');
-            }
-
-            const tokenContract = new web3.eth.Contract(tokenABI, tokenContractAddress);
-            const balance = await tokenContract.methods.balanceOf(address).call();
-            return web3.utils.fromWei(balance, 'ether');
-        }
-
-        async function updateBalanceUI() {
-            try {
-                const balance = await getTokenBalance(currentAccount);
-                const userInfoElement = document.getElementById('userInfo');
-                userInfoElement.innerHTML += `<p>Token Balance: ${balance}</p>`;
-            } catch (error) {
-                console.error('Error updating balance:', error);
-                showError('Failed to update token balance');
-            }
-        }
-
-        function handleAccountsChanged(accounts) {
-            if (accounts.length === 0) {
-                showError('Please connect to MetaMask.');
-            } else if (accounts[0] !== currentAccount) {
-                currentAccount = accounts[0];
-                updateBalanceUI();
-            }
-        }
-
-        // Add event listener for account changes
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', handleAccountsChanged);
-        }
-
-        // Initialize the app
-        initApp();
-    </script>
 </body>
 </html>
